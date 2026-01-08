@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vinayak Travels - Invoice Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            color: #000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Form Section */
+        .form-wrapper {
+            padding: 30px;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            margin: -30px -30px 30px -30px;
+        }
+
+        .form-header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .form-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-grid.three {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .items-table th {
+            background: #ecf0f1;
+            padding: 10px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+        }
+
+        .items-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .items-table input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        /* Invoice Preview */
+        .invoice-preview {
+            display: none;
+        }
+
+        .invoice-page {
+            background: white;
+            padding: 40px;
+            min-height: 1000px;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .company-details h1 {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .company-details p {
+            font-size: 12px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h2 {
+            font-size: 36px;
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .invoice-meta {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .invoice-meta strong {
+            color: #2c3e50;
+        }
+
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .info-box h3 {
+            font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.8;
+            margin: 3px 0;
+        }
+
+        .info-box strong {
+            color: #2c3e50;
+            font-size: 15px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        .invoice-table thead {
+            background: #34495e;
+            color: white;
+        }
+
+        .invoice-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .invoice-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 13px;
+        }
+
+        .invoice-table th:last-child,
+        .invoice-table td:last-child {
+            text-align: right;
+        }
+
+        .totals-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .payment-info {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .payment-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .payment-box h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .payment-box p {
+            font-size: 12px;
+            color: #856404;
+            margin: 5px 0;
+        }
+
+        .totals-box {
+            width: 350px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            font-size: 14px;
+            background: #f8f9fa;
+            margin-bottom: 2px;
+        }
+
+        .total-row.subtotal {
+            background: white;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total-row.grand {
+            background: #27ae60;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 15px;
+            margin-top: 5px;
+        }
+
+        .total-row.pending {
+            background: #e74c3c;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 12px 15px;
+        }
+
+        .cancellation-policy {
+            margin-top: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border: 2px solid #e74c3c;
+            border-radius: 4px;
+        }
+
+        .cancellation-policy h3 {
+            color: #e74c3c;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .policy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .policy-item {
+            font-size: 12px;
+            line-height: 1.8;
+            color: #2c3e50;
+        }
+
+        .policy-item strong {
+            color: #e74c3c;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .footer strong {
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .form-wrapper, .btn-group {
+                display: none !important;
+            }
+            
+            .invoice-preview {
+                display: block !important;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            
+            .invoice-page {
+                padding: 15px;
+                min-height: auto;
+                page-break-after: avoid;
+            }
+            
+            .invoice-header {
+                padding-bottom: 12px;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #2c3e50;
+            }
+            
+            .company-details h1 {
+                font-size: 24px;
+                margin-bottom: 3px;
+            }
+            
+            .company-details p {
+                font-size: 10px;
+                line-height: 1.4;
+            }
+            
+            .invoice-title h2 {
+                font-size: 28px;
+                margin-bottom: 5px;
+            }
+            
+            .invoice-meta {
+                font-size: 11px;
+                line-height: 1.5;
+            }
+            
+            .invoice-page > div[style*="text-align: center"] {
+                margin-bottom: 12px !important;
+            }
+            
+            .invoice-page > div[style*="text-align: center"] h2 {
+                font-size: 16px !important;
+                margin-bottom: 3px !important;
+            }
+            
+            .invoice-page > div[style*="text-align: center"] p {
+                font-size: 11px !important;
+            }
+            
+            .info-section {
+                gap: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .info-box {
+                padding: 12px;
+                border-left: 3px solid #3498db;
+            }
+            
+            .info-box h3 {
+                font-size: 11px;
+                margin-bottom: 8px;
+            }
+            
+            .info-box p {
+                font-size: 10px;
+                line-height: 1.5;
+                margin: 2px 0;
+            }
+            
+            .info-box strong {
+                font-size: 12px;
+                margin-bottom: 3px;
+            }
+            
+            #paymentNoteBox {
+                padding: 8px 12px !important;
+                margin-bottom: 12px !important;
+            }
+            
+            #paymentNoteBox p {
+                font-size: 11px !important;
+            }
+            
+            .invoice-table {
+                margin: 15px 0;
+            }
+            
+            .invoice-table th {
+                padding: 8px;
+                font-size: 10px;
+            }
+            
+            .invoice-table td {
+                padding: 8px;
+                font-size: 11px;
+            }
+            
+            #packageIncludesSection {
+                margin: 15px 0 !important;
+                padding: 12px !important;
+            }
+            
+            #packageIncludesSection h3 {
+                font-size: 12px !important;
+                margin-bottom: 8px !important;
+            }
+            
+            #packageIncludesSection ul {
+                padding-left: 15px !important;
+            }
+            
+            #packageIncludesSection li {
+                font-size: 10px !important;
+                line-height: 1.6 !important;
+                margin: 3px 0 !important;
+            }
+            
+            .totals-section {
+                margin-top: 15px;
+                gap: 15px;
+            }
+            
+            .payment-box {
+                padding: 10px;
+            }
+            
+            .payment-box h4 {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+            
+            .payment-box p {
+                font-size: 10px;
+                margin: 3px 0;
+            }
+            
+            .totals-box {
+                width: 300px;
+            }
+            
+            .total-row {
+                padding: 6px 10px;
+                font-size: 11px;
+                margin-bottom: 1px;
+            }
+            
+            .total-row.pending {
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+            
+            .cancellation-policy {
+                margin-top: 15px;
+                padding: 12px;
+                border: 1.5px solid #e74c3c;
+                page-break-inside: avoid;
+            }
+            
+            .cancellation-policy h3 {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .policy-grid {
+                gap: 12px;
+            }
+            
+            .policy-item {
+                font-size: 9px;
+                line-height: 1.5;
+            }
+            
+            .policy-item strong {
+                margin-bottom: 3px;
+                font-size: 9.5px;
+            }
+            
+            .footer {
+                margin-top: 15px;
+                padding-top: 10px;
+                font-size: 10px;
+            }
+            
+            .footer strong {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid, .form-grid.three, .info-section, .policy-grid {
+                grid-template-columns: 1fr;
+            }
+            .totals-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .totals-box, .payment-info {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- FORM SECTION -->
+        <div class="form-wrapper" id="formSection">
+            <div class="form-header">
+                <h1>VINAYAK TRAVELS</h1>
+                <p>Invoice Generator</p>
+            </div>
+
+            <div class="section-title">Company & Contact Details</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Company Phone</label>
+                    <input type="tel" id="companyPhone" value="+91 8452837803">
+                </div>
+                <div class="form-group">
+                    <label>Company Email</label>
+                    <input type="email" id="companyEmail" value="info@vinayaktravels.com">
+                </div>
+            </div>
+
+            <div class="section-title">Invoice Details</div>
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Invoice Date *</label>
+                    <input type="date" id="invoiceDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Tour/Event Name *</label>
+                    <input type="text" id="tourName" placeholder="e.g., Trinetra ek Khoj" required>
+                </div>
+                <div class="form-group">
+                    <label>Tour Dates</label>
+                    <input type="text" id="tourDates" placeholder="e.g., 26-27-28 December">
+                </div>
+            </div>
+
+            <div class="section-title">Client Information</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Client Name *</label>
+                    <input type="text" id="customerName" placeholder="Enter full name" required>
+                </div>
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="tel" id="customerPhone" placeholder="+91-XXXXXXXXXX">
+                </div>
+            </div>
+            <div class="form-group full">
+                <label>Pickup/Drop Location</label>
+                <input type="text" id="pickupLocation" placeholder="e.g., Bhandup Pumping Point">
+            </div>
+
+            <div class="section-title">Service Items</div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70%;">Description (Service Details - No. of People, Package Name, etc.)</th>
+                        <th style="width: 25%;">Amount (₹)</th>
+                        <th style="width: 60px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="itemsContainer">
+                    <tr class="item-row">
+                        <td><input type="text" class="item-desc" placeholder="e.g., 2 Adults - Delhi to Agra Tour Package"></td>
+                        <td><input type="number" class="item-price" value="7000" min="0"></td>
+                        <td style="text-align: center;"><button class="btn btn-danger" onclick="removeItem(this)">×</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-secondary" onclick="addItem()">+ Add Item</button>
+
+            <div class="section-title">Payment Details</div>
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Advance Payment (₹)</label>
+                    <input type="number" id="advancePayment" value="4000" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Booking Amount per Person (₹)</label>
+                    <input type="number" id="bookingAmount" value="2000" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Cancellation Charges (₹)</label>
+                    <input type="number" id="cancellationCharges" value="1900" min="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Payment Note (e.g., "Payment To: Name")</label>
+                <input type="text" id="paymentNote" placeholder="Payment To: Yogesh K.">
+            </div>
+
+            <div class="section-title">Package Includes</div>
+            <div class="form-group">
+                <label>What's Included in Package (separate with commas or new lines)</label>
+                <textarea id="packageIncludes" placeholder="e.g., Transportation, Hotel Accommodation, Breakfast & Dinner, Entry Tickets, Professional Guide, Travel Insurance"></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                <button class="btn btn-primary" onclick="generateInvoice()">Generate Invoice</button>
+            </div>
+        </div>
+
+        <!-- INVOICE PREVIEW -->
+        <div class="invoice-preview" id="invoicePreview">
+            <div class="invoice-page">
+                <div class="invoice-header">
+                    <div class="company-details">
+                        <h1>VINAYAK TRAVELS</h1>
+                        <p>
+                            <span id="dispCompanyPhone">+91 8452837803</span><br>
+                            <span id="dispCompanyEmail">info@vinayaktravels.com</span>
+                        </p>
+                    </div>
+                    <div class="invoice-title">
+                        <h2>INVOICE</h2>
+                        <div class="invoice-meta">
+                            <strong>Date:</strong> <span id="dispInvoiceDate"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 5px;" id="dispTourName"></h2>
+                    <p style="color: #7f8c8d; font-size: 14px;" id="dispTourDates"></p>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-box">
+                        <h3>Billed To</h3>
+                        <strong id="dispCustomerName"></strong>
+                        <p id="dispCustomerPhone"></p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Travel Details</h3>
+                        <p><strong>Pickup/Drop Location:</strong></p>
+                        <p id="dispPickupLocation"></p>
+                    </div>
+                </div>
+
+                <div id="paymentNoteBox" style="background: #e8f5e9; padding: 12px 20px; margin-bottom: 20px; border-left: 4px solid #27ae60; display: none;">
+                    <p style="color: #27ae60; font-weight: 600; font-size: 14px;" id="dispPaymentNote"></p>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70%;">Description</th>
+                            <th style="width: 30%;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceItems"></tbody>
+                </table>
+
+                <div id="packageIncludesSection" style="display: none; margin: 30px 0; padding: 25px; background: #e8f5e9; border-left: 4px solid #27ae60;">
+                    <h3 style="color: #27ae60; font-size: 16px; margin-bottom: 15px;">📦 PACKAGE INCLUDES</h3>
+                    <div id="dispPackageIncludes" style="color: #2c3e50; font-size: 13px; line-height: 2;"></div>
+                </div>
+
+                <div class="totals-section">
+                    <div class="payment-info">
+                        <div class="payment-box">
+                            <h4>📋 Payment Information</h4>
+                            <p><strong>Booking Amount:</strong> ₹<span id="dispBookingAmount">2000</span>/- per person</p>
+                            <p><strong>Cancellation Charges:</strong> ₹<span id="dispCancellationCharges">1900</span>/- per person</p>
+                        </div>
+                    </div>
+                    <div class="totals-box">
+                        <div class="total-row subtotal">
+                            <span><strong>SUB TOTAL:</strong></span>
+                            <span><strong>₹<span id="dispSubtotal">0</span>/-</strong></span>
+                        </div>
+                        <div class="total-row" id="advanceRow" style="display: none;">
+                            <span>ADVANCE PAYMENT:</span>
+                            <span>₹<span id="dispAdvance">0</span>/-</span>
+                        </div>
+                        <div class="total-row pending" id="pendingRow" style="display: none;">
+                            <span><strong>PENDING AMOUNT:</strong></span>
+                            <span><strong>₹<span id="dispPending">0</span>/-</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cancellation-policy">
+                    <h3>🔹 CANCELLATION POLICY 🔹</h3>
+                    <div class="policy-grid">
+                        <div>
+                            <div class="policy-item">
+                                <strong>🔹 Booking Amount:</strong>
+                                ₹<span id="policyBookingAmount">2000</span>/- per person
+                            </div>
+                            <div class="policy-item">
+                                <strong>🔹 If cancellation is initiated by the customer:</strong>
+                                ₹<span id="policyCancellationCharges">1900</span>/- per person will be deducted as cancellation charges. The remaining balance will be refunded.
+                            </div>
+                            <div class="policy-item">
+                                <strong>🔹 If cancellation is initiated by Vinayak Travels:</strong>
+                                Full amount will be refunded without any deduction.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="policy-item">
+                                <strong>🔹 No Refund for:</strong>
+                                – No-show at pickup point<br>
+                                – Last-minute cancellation (within 24 hrs of departure)<br>
+                                – Failure to reach pickup point on time
+                            </div>
+                            <div class="policy-item">
+                                <strong>🔹 Refund Processing:</strong>
+                                Refunds will be processed within 5–7 working days after confirmation.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <strong>🌍 Thank you for traveling with Vinayak Travels 🌍</strong>
+                </div>
+            </div>
+
+            <div class="btn-group" style="padding: 0 40px 40px;">
+                <button class="btn btn-secondary" onclick="editInvoice()">← Edit</button>
+                <button class="btn btn-primary" onclick="window.print()">Print Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('invoiceDate').valueAsDate = new Date();
+
+        function calculateItemTotal(row) {
+            // No calculation needed - direct price entry
+        }
+
+        document.addEventListener('input', (e) => {
+            // No auto-calculation needed
+        });
+
+        function addItem() {
+            const container = document.getElementById('itemsContainer');
+            const newRow = container.querySelector('.item-row').cloneNode(true);
+            newRow.querySelectorAll('input').forEach(input => {
+                input.value = input.classList.contains('item-price') ? '0' : '';
+            });
+            container.appendChild(newRow);
+        }
+
+        function removeItem(btn) {
+            const container = document.getElementById('itemsContainer');
+            if (container.children.length > 1) {
+                btn.closest('.item-row').remove();
+            } else {
+                alert('At least one item is required!');
+            }
+        }
+
+        function generateInvoice() {
+            const customerName = document.getElementById('customerName').value;
+            const tourName = document.getElementById('tourName').value;
+
+            if (!customerName || !tourName) {
+                alert('Please fill in required fields: Client Name and Tour Name');
+                return;
+            }
+
+            document.getElementById('dispCompanyPhone').textContent = document.getElementById('companyPhone').value;
+            document.getElementById('dispCompanyEmail').textContent = document.getElementById('companyEmail').value;
+            document.getElementById('dispCustomerName').textContent = customerName;
+            document.getElementById('dispCustomerPhone').textContent = document.getElementById('customerPhone').value || '';
+            document.getElementById('dispPickupLocation').textContent = document.getElementById('pickupLocation').value || 'N/A';
+            document.getElementById('dispInvoiceDate').textContent = new Date(document.getElementById('invoiceDate').value).toLocaleDateString('en-IN');
+            document.getElementById('dispTourName').textContent = tourName;
+            document.getElementById('dispTourDates').textContent = document.getElementById('tourDates').value || '';
+
+            const paymentNote = document.getElementById('paymentNote').value;
+            if (paymentNote) {
+                document.getElementById('paymentNoteBox').style.display = 'block';
+                document.getElementById('dispPaymentNote').textContent = paymentNote;
+            } else {
+                document.getElementById('paymentNoteBox').style.display = 'none';
+            }
+
+            const itemsContainer = document.getElementById('itemsContainer');
+            const rows = itemsContainer.querySelectorAll('.item-row');
+            let invoiceItemsHTML = '';
+            let subtotal = 0;
+
+            rows.forEach(row => {
+                const desc = row.querySelector('.item-desc').value;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+
+                if (desc && price >= 0) {
+                    invoiceItemsHTML += `
+                        <tr>
+                            <td>${desc}</td>
+                            <td>₹${price.toLocaleString('en-IN')}</td>
+                        </tr>
+                    `;
+                    subtotal += price;
+                }
+            });
+
+            document.getElementById('invoiceItems').innerHTML = invoiceItemsHTML;
+            document.getElementById('dispSubtotal').textContent = subtotal.toLocaleString('en-IN');
+
+            // Package Includes
+            const packageIncludes = document.getElementById('packageIncludes').value;
+            if (packageIncludes) {
+                document.getElementById('packageIncludesSection').style.display = 'block';
+                const items = packageIncludes.split(/[,\n]+/).filter(item => item.trim());
+                let includesHTML = '<ul style="margin: 0; padding-left: 20px;">';
+                items.forEach(item => {
+                    includesHTML += `<li style="margin: 5px 0;">✓ ${item.trim()}</li>`;
+                });
+                includesHTML += '</ul>';
+                document.getElementById('dispPackageIncludes').innerHTML = includesHTML;
+            } else {
+                document.getElementById('packageIncludesSection').style.display = 'none';
+            }
+
+            const advance = parseFloat(document.getElementById('advancePayment').value) || 0;
+            const pending = subtotal - advance;
+
+            if (advance > 0) {
+                document.getElementById('advanceRow').style.display = 'flex';
+                document.getElementById('dispAdvance').textContent = advance.toLocaleString('en-IN');
+            } else {
+                document.getElementById('advanceRow').style.display = 'none';
+            }
+
+            if (pending > 0) {
+                document.getElementById('pendingRow').style.display = 'flex';
+                document.getElementById('dispPending').textContent = pending.toLocaleString('en-IN');
+            } else {
+                document.getElementById('pendingRow').style.display = 'none';
+            }
+
+            const bookingAmount = document.getElementById('bookingAmount').value;
+            const cancellationCharges = document.getElementById('cancellationCharges').value;
+            
+            document.getElementById('dispBookingAmount').textContent = bookingAmount;
+            document.getElementById('dispCancellationCharges').textContent = cancellationCharges;
+            document.getElementById('policyBookingAmount').textContent = bookingAmount;
+            document.getElementById('policyCancellationCharges').textContent = cancellationCharges;
+
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('invoicePreview').style.display = 'block';
+        }
+
+        function editInvoice() {
+            document.getElementById('invoicePreview').style.display = 'none';
+            document.getElementById('formSection').style.display = 'block';
+        }
+
+        function resetForm() {
+            if (confirm('Are you sure you want to reset the form?')) {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
